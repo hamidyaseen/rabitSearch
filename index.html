@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Testing TS</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+</head>
+    <body>
+        <div class="jumbotron text-center">
+            <h2>Search Secret</h2>
+            <h5>Rabit need to jump wisely to search</h5>
+        </div>
+        <div class="container-sm">
+            <form>
+                <div class="form-group">
+                    <label for="anagramId">Anagram</label>
+                    <input type="text" id="anagramId" class="form-control" value="poultry outwits ants" />
+                </div>
+                <div class="form-group">
+                    <label for="hasId">hashed secret</label>
+                    <input type="text" id="hashId" class="form-control" value="e4820b45d2277f3844eac66c903e84be" />
+                </div>
+                <span class="form-group">
+                    <label>Browse input file</label>
+                    <input type="file" id="file-button-id" class="form-control">
+                </span>
+                <div class="form-group">
+                    <label for="messageId">Hidden secret is...</label>
+                    <div id="messageId" class="form-control"></div>
+                </div>
+            </form>
+        </div>
+        <script src="./bundle.js"></script>
+    </body>
+</html>
