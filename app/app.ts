@@ -1,5 +1,5 @@
 
-import { ISubRange, IWordInfo, SecretSearch } from './secretsearch';
+import { ISubRange, IWordsInfo, SecretSearch } from './secretsearch';
 import type { ISecretSearch } from './secretsearch';
 
 //: - Read Input words data from file;
@@ -42,23 +42,23 @@ let select = (event: Event) => {
         const lines = (linesData as string).split('\n');        
         return lines;
     }).then(
-        (lines: string[]): IWordInfo => {
+        (lines: string[]): IWordsInfo => {
             search.anagram = document.getElementById('anagramId')?.getAttribute('value')!;
-            let wordsList = search.possibleWordsList(lines);
-            return wordsList;
-        }).then((wordsList: IWordInfo): void => {
+            let wordsInfo = search.possibleWordsList(lines);           
+            return wordsInfo;
+        }).then((wordsInfo: IWordsInfo): void => {
             let hash = document.getElementById('hashId')?.getAttribute('value')!;
 
-            let WordsLengthDataSample = search.getPossibleWordsLengthsSampleData();
-            let mean = search.calculateMeanOfWordsLengthsSampleData(WordsLengthDataSample);
-            let sDeviation = search.calculateStandardDeviationOfWordsLengthsSampleData(WordsLengthDataSample);
+            let mean = search.calculateMeanOfWordsLengthsSampleData(wordsInfo.wordsLengths);
+            let sDeviation = search.calculateStandardDeviationOfWordsLengthsSampleData(wordsInfo.wordsLengths);
 
             console.log(`Samples data mean ${mean} and standard deviation ${sDeviation}`);
 
             let secret = ""; let beforeTime = 0, afterTime = 0;
             // first top to buttom approach ...
             beforeTime = Date.now();
-            secret = search.searchWord(wordsList, hash);         
+            secret = search.searchWord(wordsInfo.wordsList, hash);
+            //secret = search.searchWordInSubset(wordsInfo.wordsList, hash, { start: 1, ends: 1 })
             afterTime = Date.now();            
 
             document.getElementById('messageId')!.innerText = secret;

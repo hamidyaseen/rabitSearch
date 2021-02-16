@@ -1,18 +1,22 @@
 import { Md5 } from 'ts-md5/dist/md5';
 
-export interface IWordInfo {
+export interface IWordsList {
     length: any;
     [key: number]: string[];
 }
+export interface IWordsInfo {
+    wordsList: IWordsList;
+    wordsLengths: number[];
+} 
+
 export interface ISecretSearch {
     anagram: string;
-    possibleWordsList(lines: string[]): IWordInfo;
-    getPossibleWordsLengthsSampleData(): number[];
+    possibleWordsList(lines: string[]): IWordsInfo;
+
     calculateMeanOfWordsLengthsSampleData(sampleData: number[]): number;
     calculateStandardDeviationOfWordsLengthsSampleData(sampleData: number[]): number;
-    searchWord(words: IWordInfo, hash: string): string;
-   // searchWordDouble(words: IWordInfo, hash: string): string;
-    searchWordInSubset(words: IWordInfo, hash: string, range: ISubRange): string;
+    searchWord(words: IWordsList, hash: string): string;   
+    searchWordInSubset(words: IWordsList, hash: string, range: ISubRange): string;
 }
 
 export interface ISubRange {
@@ -23,8 +27,8 @@ export interface ISubRange {
 export class SecretSearch implements ISecretSearch {
     private _anagram: string = '';
     private _anaLet: string = '';
-    private wordsLists: IWordInfo = [];
-    private _wordsLengths: number[] = [];
+    //private wordsList: IWordsList = [];
+    //private _wordsLengths: number[] = [];
 
     constructor() { }
     set anagram(an: string) {
@@ -36,32 +40,30 @@ export class SecretSearch implements ISecretSearch {
     get anagram(): string { return this._anagram; }
 
 
-    public possibleWordsList(lines: string[]): IWordInfo {
-        //let reWords = [];
-        this.wordsLists = [], this._wordsLengths=[];
-        for (var line = 0; (line < lines.length); line++) {
-            if (this.isPossibleWord(lines[line])) {
-                let word = lines[line];
+    public possibleWordsList(lines: string[]): IWordsInfo
+    {
+        let wInfo = { wordsList: [], wordsLengths: [] } as IWordsInfo;
+        for (var lineNo = 0; (lineNo < lines.length); lineNo++)
+        {
+            let word = lines[lineNo];
+            if (this.isPossibleWord(word)) {                
                 let len = word.length;
-                if (this.wordsLists[len] === undefined) {
-                    this.wordsLists[len] = [];
-                    this._wordsLengths.push(len);
+                if (wInfo.wordsList[len] === undefined) {
+                    wInfo.wordsList[len] = [];
+                    wInfo.wordsLengths.push(len);
                 }
-                    
-                let a = this.wordsLists[len];
-                if (a.find((value: string) => (value === word)) === undefined)
-                    this.wordsLists[len].push(word);
+                    // if the word does not exist, add it once.
+                let wordsArray = wInfo.wordsList[len];
+                if (wordsArray.find((value: string) => (value === word)) === undefined)
+                    wInfo.wordsList[len].push(word);
             }
         }
-        console.log(this._wordsLengths);
-        return this.wordsLists;
+        console.log(wInfo.wordsLengths);
+        return wInfo;
     }
-    public getPossibleWordsLengthsSampleData(): number[] {
-        return this._wordsLengths;
-    }
+
     public calculateMeanOfWordsLengthsSampleData(sampleData: number[]): number {
-        let dataSum = 0;
-        
+        let dataSum = 0;        
         for (let index = 0; index < sampleData.length; index++) {
             dataSum += sampleData[index];
         }
@@ -77,23 +79,43 @@ export class SecretSearch implements ISecretSearch {
 
         return Math.sqrt(sum / sampleData.length);
     }
-                                                                                                
-    public searchWordInSubset(words: IWordInfo, hash: string, range: ISubRange): string
+
+    //public canStartEdge(words: IWordsList, i: number, anagram: string): number {
+    //    let maxLength = anagram.length - 2;
+    //    let maxIndex = words.length-1;
+    //    try {
+    //        let restLen = maxLength - i;            
+    //    }
+    //    catch (e) {
+    //    }
+    //}
+    //public checkEdgeCases(words: IWordsList, indexArray: number[]): number[] {
+    //    let firstIndex = indexArray[0], secondIndex = indexArray[1], thirdIndex = indexArray[2];
+    //    if (parseInt(firstIndex.toString()) === NaN || parseInt(secondIndex.toString()) === NaN || parseInt(thirdIndex.toString()) === NaN)
+    //        return [];
+    //    return [];
+    //}
+    
+    public searchWordInSubset(words: IWordsList, hash: string, range: ISubRange): string
     {
         let result = "";
         let anagramLen = this.anagram.length - 2; // 2 are space character
        
         let aCombination = '';
         try {
-            for (let i = range.start; i < range.ends; i++){
+            for (let i = range.start; i <= range.ends; i++){
                 let restLen = anagramLen - i;
+                let combinationStart = 1;
+                if (restLen > 16) { // it would cross the index limit,
+
+                }
                 for (let j = 1, k = (restLen - 1); (j < restLen && k > 0); j++, k--) {
                     for (let l = 0; l < words[i].length; l++) {
                         for (let m = 0; m < words[j].length; m++) {
                             for (let n = 0; n < words[k].length; n++)
                             {
-                                aCombination = Array.from([words[i][l], words[j][m], words[k][n]]).join(' ');                                
-                                
+                                aCombination = Array.from([words[i][l], words[j][m], words[k][n]]).join(' ');
+                                console.log(`[${words[i][l]}, ${words[j][m]}, ${words[k][n]}`);
                                 if (Md5.hashStr(aCombination) === hash) {
                                     result = aCombination;
                                     //    //i = j = k = len; // break the loops to save processing time
@@ -111,7 +133,7 @@ export class SecretSearch implements ISecretSearch {
         }        
         return result;
     }
-    public searchWord(words: IWordInfo, hash: string): string {
+    public searchWord(words: IWordsList, hash: string): string {
         let result = "";
         let len = words.length - 1;
         let anagramLen = this.anagram.length - 2; // 2 are space character
@@ -144,7 +166,7 @@ export class SecretSearch implements ISecretSearch {
         return result;
     }
 
-    //public searchWordDouble(words: IWordInfo, hash: string): string {
+    //public searchWordDouble(words: IWordsList, hash: string): string {
     //    let result = "";
     //    let len = words.length - 1;
     //    let anagramLen = this.anagram.length - 2; // 2 are space character
