@@ -57,8 +57,8 @@ let select = (event: Event) => {
             let secret = ""; let beforeTime = 0, afterTime = 0;
             // first top to buttom approach ...
             beforeTime = Date.now();
-            secret = search.searchWord(wordsInfo.wordsList, hash);
-            //secret = search.searchWordInSubset(wordsInfo.wordsList, hash, { start: 1, ends: 1 })
+            secret = search.searchWord(wordsInfo, hash);
+            //secret = search.searchWordInSubset(wordsInfo, hash, { start: 3, ends: 4 })
             afterTime = Date.now();            
 
             document.getElementById('messageId')!.innerText = secret;
